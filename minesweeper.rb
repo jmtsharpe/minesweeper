@@ -19,18 +19,27 @@ class Board
     end
   end
 
+  def test_render
+    @grid.each do |el|
+      el.each do |el2|
+        print el2.revealed ? "true " : "false "
+      end
+      puts "\n"
+    end
+  end
+
 
 
 end
 
 
 class Tile
-  attr_accessor :row, :col
+  attr_accessor :row, :col, :mine, :adj_mines, :revealed 
   def initialize
     @mine = false
     @revealed = false
     @flagged = false
-    @row, @col = nil
+    @row, @col, @adj_mines = nil
   end
 
 
@@ -62,7 +71,6 @@ class Game
     coord_array = [[row, col + 1], [row, col - 1], [row - 1, col], [row + 1, col]]
     coord_array = coord_array.select {|row, col| row >= 0 && row < size && col >= 0 && col < size }
     coord_array.map { |row, col| board.grid[row][col] }
-
   end
 
   def diag_array(arr)
@@ -71,20 +79,30 @@ class Game
     coord_array = [[row + 1, col + 1], [row - 1, col - 1], [row - 1, col + 1], [row + 1, col - 1]]
     coord_array = coord_array.select {|row, col| row >= 0 && row < size && col >= 0 && col < size }
     coord_array.map { |row, col| board.grid[row][col] }
-
   end
 
-  def find_mine(arr)
+  def find_mines(arr)
     arr.select { |tile| tile.mine == true }
   end
 
-  def reveal(tile, row, col)
+  def reveal(tile)
+    return if tile.revealed
+    return if tile.mine
+
     tile.reveal
 
-    diagonal_tiles = diag_array([row,col])
+    diagonal_tiles = diag_array([tile.row, tile.col])
+    puts "diag"
 
-    perp_array
+    perp_tiles = perp_array([tile.row,tile.col])
+    puts "perp"
 
+    perp_tiles.each do |tile|
+      reveal(tile)
+    end
+    puts "perp tiles iterator"
+
+    tile.adj_mines = find_mines(diagonal_tiles + perp_tiles).length
   end
 
 
