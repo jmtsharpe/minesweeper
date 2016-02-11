@@ -8,7 +8,7 @@ class Board
     total_mines = [false,false,false,true]
     @grid.each do |row|
       row.each do |col|
-        col
+        col -- 
 
 
   end
