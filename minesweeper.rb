@@ -8,24 +8,31 @@ class Board
 
   def lay_mines
 
-    @grid.each do |row|
-      row.each do |col|
+    @grid.each_with_index do |row, idx1|
+      row.each_with_index do |col, idx2|
+
+        col.col = idx2
+        col.row = idx1
         mine_or_not = rand(3)
         col.make_mine if mine_or_not == 2
       end
     end
   end
 
+
+
 end
 
 
 class Tile
-
+  attr_accessor :row, :col
   def initialize
     @mine = false
     @revealed = false
     @flagged = false
+    @row, @col = nil
   end
+
 
   def make_mine
     @mine = true
@@ -49,6 +56,41 @@ class Game
     @board = Board.new(size)
   end
 
+  def perp_array(arr)
+    size = board.grid.length
+    row, col = arr[0], arr[1]
+    coord_array = [[row, col + 1], [row, col - 1], [row - 1, col], [row + 1, col]]
+    coord_array = coord_array.select {|row, col| row >= 0 && row < size && col >= 0 && col < size }
+    coord_array.map { |row, col| board.grid[row][col] }
+
+  end
+
+  def diag_array(arr)
+    size = board.grid.length
+    row, col = arr[0], arr[1]
+    coord_array = [[row + 1, col + 1], [row - 1, col - 1], [row - 1, col + 1], [row + 1, col - 1]]
+    coord_array = coord_array.select {|row, col| row >= 0 && row < size && col >= 0 && col < size }
+    coord_array.map { |row, col| board.grid[row][col] }
+
+  end
+
+  def find_mine(arr)
+    arr.select { |tile| tile.mine == true }
+  end
+
+  def reveal(tile, row, col)
+    tile.reveal
+
+    diagonal_tiles = diag_array([row,col])
+
+    perp_array
+
+  end
+
+
+
+
+
   # def adj_array(arr)
   #   row, col = arr[0], arr[1]
   #
@@ -67,29 +109,6 @@ class Game
   #
   #   adj_array[1..-1]
   # end
-
-  def perp_array(arr)
-    size = board.grid.length
-    row, col = arr[0], arr[1]
-    coord_array = [[row, col + 1], [row, col - 1], [row - 1, col], [row + 1, col]]
-    coord_array = coord_array.select {|row, col| row >= 0 && row < size && col >= 0 && col < size }
-    perp_array = coord_array.map { |row, col| board.grid[row][col] }
-
-  end
-
-  def diag_array(arr)
-    size = board.grid.length
-    row, col = arr[0], arr[1]
-    coord_array = [[row + 1, col + 1], [row - 1, col - 1], [row - 1, col + 1], [row + 1, col - 1]]
-    coord_array = coord_array.select {|row, col| row >= 0 && row < size && col >= 0 && col < size }
-    diag_array = coord_array.map { |row, col| board.grid[row][col] }
-  end
-
-  def find_mine(arr)
-
-
-  end
-
 
 
 end
