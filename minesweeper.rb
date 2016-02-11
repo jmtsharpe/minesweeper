@@ -49,23 +49,47 @@ class Game
     @board = Board.new(size)
   end
 
-  def adj_array(arr)
+  # def adj_array(arr)
+  #   row, col = arr[0], arr[1]
+  #
+  #   rows = [row, row - 1, row + 1]
+  #   cols = [col, col - 1, col + 1]
+  #
+  #   size = board.grid.length - 1
+  #   adj_array = []
+  #   rows.each do |el|
+  #     if el >= 0 && el <= size
+  #       cols.each do |el2|
+  #         adj_array << board.grid[el][el2] if el2 >= 0 && el2 <= size
+  #       end
+  #     end
+  #   end
+  #
+  #   adj_array[1..-1]
+  # end
+
+  def perp_array(arr)
+    size = board.grid.length
     row, col = arr[0], arr[1]
+    coord_array = [[row, col + 1], [row, col - 1], [row - 1, col], [row + 1, col]]
+    coord_array = coord_array.select {|row, col| row >= 0 && row < size && col >= 0 && col < size }
+    perp_array = coord_array.map { |row, col| board.grid[row][col] }
 
-    rows = [row, row - 1, row + 1]
-    cols = [col, col - 1, col + 1]
-
-    size = board.grid.length - 1
-    adj_array = []
-    rows.each do |el|
-      if el >= 0 && el <= size
-        cols.each do |el2|
-          adj_array << board.grid[el][el2] if el2 >= 0 && el2 <= size
-        end
-      end
-    end
-
-    adj_array[1..-1]
   end
+
+  def diag_array(arr)
+    size = board.grid.length
+    row, col = arr[0], arr[1]
+    coord_array = [[row + 1, col + 1], [row - 1, col - 1], [row - 1, col + 1], [row + 1, col - 1]]
+    coord_array = coord_array.select {|row, col| row >= 0 && row < size && col >= 0 && col < size }
+    diag_array = coord_array.map { |row, col| board.grid[row][col] }
+  end
+
+  def find_mine(arr)
+
+
+  end
+
+
 
 end
