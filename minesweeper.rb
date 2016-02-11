@@ -22,17 +22,32 @@ class Board
   end
 
   def render
-    puts "-------------------------------------"
-    @grid.each do |el|
+    puts " - 1   2   3   4   5   6   7   8   9 -"
+    puts " -------------------------------------"
+    @grid.each_with_index do |el,idx|
+      print idx + 1
       el.each do |el2|
-        print el2.revealed ? "| #{el2.adj_mines} ".colorize(:color => :blue) : "|" + " ? ".colorize(:background => :light_white)
+        print el2.revealed ? " | #{el2.adj_mines} ".colorize(:color => :blue) : "|" + " ? ".colorize(:background => :light_white)
       end
       print "|"
       puts "\n"
-      puts "-------------------------------------"
+      puts " -------------------------------------"
     end
   end
 
+  def lose_render
+    puts " - 1   2   3   4   5   6   7   8   9 -"
+    puts " -------------------------------------"
+    @grid.each_with_index do |el,idx|
+      print idx + 1
+      el.each do |el2|
+        print el2.mine ? "|" + " ! ".colorize(:background => :red) : "|" + "   ".colorize(:color => :blue)
+      end
+      print "|"
+      puts "\n"
+      puts " -------------------------------------"
+    end
+  end
 
 
 end
@@ -72,21 +87,33 @@ class Game
   end
 
   def play
-    lose = false
-    until lose
-      board.render
+    system("clear")
+    board.render
 
-      coords = parse_input(get_input)
-      row, col = coords[0].to_i, coords[1].to_i
-      tile = board.grid[row][col]
+    coords = parse_input(get_input)
+    row, col = coords[0].to_i - 1, coords[1].to_i - 1
+    tile = board.grid[row][col]
 
-      if tile.mine
-        lose = true
-      else
-        reveal(tile)
+    if tile.mine
+      lose
+    else
+      reveal(tile)
+      play
+    end
+
+  end
+
+  def lose
+    system("clear")
+    board.grid.each do |row|
+      row.each do |col|
+        col.reveal
       end
     end
-    puts "you lose!"
+
+    board.lose_render
+    puts "You lose"
+
   end
 
   def parse_input(string)
