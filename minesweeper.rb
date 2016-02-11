@@ -1,3 +1,5 @@
+require 'colorize'
+
 class Board
 
   attr_reader :grid
@@ -13,18 +15,21 @@ class Board
 
         col.col = idx2
         col.row = idx1
-        mine_or_not = rand(3)
-        col.make_mine if mine_or_not == 2
+        mine_or_not = rand(2)
+        col.make_mine if mine_or_not == 1
       end
     end
   end
 
-  def test_render
+  def render
+    puts "-------------------------------------"
     @grid.each do |el|
       el.each do |el2|
-        print el2.revealed ? "true " : "false "
+        print el2.revealed ? "| #{el2.adj_mines} ".colorize(:color => :blue) : "|" + " ? ".colorize(:background => :light_white)
       end
+      print "|"
       puts "\n"
+      puts "-------------------------------------"
     end
   end
 
@@ -34,7 +39,7 @@ end
 
 
 class Tile
-  attr_accessor :row, :col, :mine, :adj_mines, :revealed 
+  attr_accessor :row, :col, :mine, :adj_mines, :revealed
   def initialize
     @mine = false
     @revealed = false
@@ -63,6 +68,34 @@ class Game
 
   def initialize(size = 9)
     @board = Board.new(size)
+    board.lay_mines
+  end
+
+  def play
+    lose = false
+    until lose
+      board.render
+
+      coords = parse_input(get_input)
+      row, col = coords[0].to_i, coords[1].to_i
+      tile = board.grid[row][col]
+
+      if tile.mine
+        lose = true
+      else
+        reveal(tile)
+      end
+    end
+    puts "you lose!"
+  end
+
+  def parse_input(string)
+    string.split(",")
+  end
+
+  def get_input
+    puts "Choose your tile."
+    gets.chomp
   end
 
   def perp_array(arr)
@@ -92,15 +125,15 @@ class Game
     tile.reveal
 
     diagonal_tiles = diag_array([tile.row, tile.col])
-    puts "diag"
+
 
     perp_tiles = perp_array([tile.row,tile.col])
-    puts "perp"
+
 
     perp_tiles.each do |tile|
       reveal(tile)
     end
-    puts "perp tiles iterator"
+
 
     tile.adj_mines = find_mines(diagonal_tiles + perp_tiles).length
   end
@@ -129,4 +162,9 @@ class Game
   # end
 
 
+end
+
+if __FILE__ == $PROGRAM_NAME
+  new_game = Game.new(9)
+  new_game.play
 end
