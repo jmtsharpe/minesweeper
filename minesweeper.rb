@@ -5,10 +5,13 @@ class Board
   end
 
   def lay_mines
-    total_mines = [false,false,false,true]
+
     @grid.each do |row|
       row.each do |col|
-        col -- 
+        mine_or_not = rand(4)
+        col.make_mine if mine_or_not == 3
+      end
+    end
 
 
   end
@@ -17,6 +20,8 @@ end
 
 
 class Tile
+
+
 
   def initialize
     @mine = false
